@@ -2,23 +2,31 @@
 <html>
 <head>
 	<title>Product Attributes</title>
-	<link rel="stylesheet" type="text/css" href="box.css">
-	<link rel="stylesheet" type="text/css" href="boxcolor.css">
-
 	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/tablestyles.css">
+	<script src="js/sorttable.js"></script>
 </head>
+
 <body>
-	<h5>Dominant color of this product is</h5>
-	<div class="box boxcolor"></div>
-
+	<h4>Source Image</h4>
+	<img src="img/source_image" alt="Source Image" style="width:304px;height:228px;">
 	<hr/>
-	<pre id="colordata">Put the color JSON here</pre>
 
-	<script type="text/javascript">
-		$.getJSON( "colordata.json", function( data ) {
-			var jsonPretty = JSON.stringify(data, undefined, 2); 
-			document.getElementById("colordata").innerHTML = jsonPretty;
-		});
-	</script>
+	<h4>Dominant Colors</h4>
+	<div id="colordata">
+		<table id="sortedtable" class="sortable" border='1'>
+			<thead>
+				<tr>
+					<th>Score</th>
+					<th>pixelFraction</th>
+					<th>rgb</th>
+					<th>Color</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+
+	<script type="text/javascript" src='js/colordata.js'></script>
 </body>
 </html>
