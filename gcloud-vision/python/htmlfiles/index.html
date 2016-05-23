@@ -11,10 +11,24 @@
 	<h4>Source Image</h4>
 	<img src="img/source_image" alt="Source Image" style="width:304px;height:228px;">
 	<hr/>
+	<h4>Labels</h4>
+	<div id="labeldata">
+		<table class="sortable" border='1'>
+			<thead>
+				<tr>
+					<th>Score</th>
+					<th>mid</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
 
-	<h4>Dominant Colors</h4>
+	<hr/>
+	<h4>Colors</h4>
 	<div id="colordata">
-		<table id="sortedtable" class="sortable" border='1'>
+		<table class="sortable" border='1'>
 			<thead>
 				<tr>
 					<th>Score</th>
@@ -28,5 +42,6 @@
 	</div>
 
 	<script type="text/javascript" src='js/colordata.js'></script>
+	<script type="text/javascript" src='js/labeldata.js'></script>
 </body>
 </html>

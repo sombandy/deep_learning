@@ -1,4 +1,4 @@
-$.getJSON( "colordata.json", function( data ) {
+$.getJSON( "data/colors.json", function( data ) {
 	for(i = 0; i < data.length; i++) {
 		var rgbcolor = rgbColor(data[i].color);
 		var hexcolor = rgbToHex(data[i].color);

@@ -14,38 +14,54 @@ from oauth2client.client import GoogleCredentials
 
 DISCOVERY_URL='https://{api}.googleapis.com/$discovery/rest?version={apiVersion}'
 
-def get_vision_service():
-    credentials = GoogleCredentials.get_application_default()
-    return discovery.build('vision', 'v1', credentials=credentials,
-                           discoveryServiceUrl=DISCOVERY_URL)
+class GVImageAnalysis(object):
 
-def detect_color(img_file, max_results=5):
-    """Uses the Vision API to detect faces in the given file.
+    def __init__(self):
+        credentials = GoogleCredentials.get_application_default()
+        self.gvision_service = discovery.build(
+            'vision', 'v1', credentials=credentials,
+            discoveryServiceUrl=DISCOVERY_URL)
+        self.image = None
 
-    Args:
-        img_file: A file-like object containing an image with faces.
+    def set_image(self, image_file):
+        with open(image_file) as f:
+            image_content = f.read()
+            self.image = base64.b64encode(image_content).decode('UTF-8')
 
-    Returns:
-        An array of dicts with information about the faces in the picture.
-    """
-    image_content = img_file.read()
-    batch_request = [{
-        'image': {
-            'content': base64.b64encode(image_content).decode('UTF-8')
-            },
-        'features': [{
-            'type': 'IMAGE_PROPERTIES',
-            'maxResults': max_results,
+    def detect_color(self, max_results=5):
+        batch_request = [{
+            'image': {
+                'content': self.image
+                },
+            'features': [{
+                'type': 'IMAGE_PROPERTIES',
+                'maxResults': max_results,
+                }]
             }]
-        }]
 
-    service = get_vision_service()
-    request = service.images().annotate(body={
-        'requests': batch_request,
-        })
-    response = request.execute()
-    return response['responses'][0]['imagePropertiesAnnotation'][
-        'dominantColors']['colors']
+        request = self.gvision_service.images().annotate(body={
+            'requests': batch_request,
+            })
+        response = request.execute()
+        return response['responses'][0]['imagePropertiesAnnotation'][
+            'dominantColors']['colors']
+
+    def get_labels(self, max_results=5):
+        batch_request = [{
+            'image': {
+                'content': self.image
+                },
+            'features': [{
+                'type': 'LABEL_DETECTION',
+                'maxResults': max_results,
+                }]
+            }]
+
+        request = self.gvision_service.images().annotate(body={
+            'requests': batch_request,
+            })
+        response = request.execute()
+        return response['responses'][0]['labelAnnotations']
 
 def main(args):
     if not args.image_file and not args.image_url:
@@ -61,13 +77,18 @@ def main(args):
     else:
         shutil.copyfile(args.image_file, out_image)
 
-    with open(out_image) as image_file:
-        colors = detect_color(image_file)
-        colordata_file = args.outdir + "/colordata.json"
+    gv_image = GVImageAnalysis()
+    gv_image.set_image(out_image)
 
-        with open(colordata_file, 'w') as f:
-            json.dump(colors, f, indent=2)
+    colors = gv_image.detect_color()
+    colors_file = args.outdir + "/data/colors.json"
+    with open(colors_file, 'w') as f:
+        json.dump(colors, f, indent=2)
 
+    labels = gv_image.get_labels()
+    labels_file = args.outdir + "/data/labels.json"
+    with open(labels_file, 'w') as f:
+        json.dump(labels, f, indent=2)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
