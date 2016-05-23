@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Product Attributes</title>
+	<link rel="stylesheet" type="text/css" href="box.css">
+	<link rel="stylesheet" type="text/css" href="boxcolor.css">
+
+	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+<body>
+	<h5>Dominant color of this product is</h5>
+	<div class="box boxcolor"></div>
+
+	<hr/>
+	<pre id="colordata">Put the color JSON here</pre>
+
+	<script type="text/javascript">
+		$.getJSON( "colordata.json", function( data ) {
+			var jsonPretty = JSON.stringify(data, undefined, 2); 
+			document.getElementById("colordata").innerHTML = jsonPretty;
+		});
+	</script>
+</body>
+</html>
