@@ -6,7 +6,7 @@
 import argparse
 import base64
 import json
-import pprint
+import shutil
 import urllib2
 
 from googleapiclient import discovery
@@ -47,46 +47,27 @@ def detect_color(img_file, max_results=5):
     return response['responses'][0]['imagePropertiesAnnotation'][
         'dominantColors']['colors']
 
-def rgb_to_hex(color):
-    r = format(color['red'], 'x')
-    g = format(color['green'], 'x')
-    b = format(color['blue'], 'x')
-    hex = "".join(['#', r, g, b]).upper()
-    return hex
-
-def store_color_output(colors, outdir):
-    for c in colors:
-        print c
-
-    num_display = 5
-    if len(colors) > 5:
-        colors = colors[:5]
-
-    colordata_file = outdir + "/colordata.json"
-    with open(colordata_file, 'w') as f:
-        json.dump(colors, f, indent=2)
-
-    d_color_hex = rgb_to_hex(colors[0]["color"])
-    boxcolor_file = outdir + "/boxcolor.css"
-    with open(boxcolor_file, 'w') as f:
-        box_css = ".boxcolor { background: %s; }" % d_color_hex
-        f.write(box_css)
-
 def main(args):
     if not args.image_file and not args.image_url:
         print "No input image is provided"
         return
 
-    if args.image_file:
-        image_file = open(args.image_file)
+    out_image = args.outdir + "/img/source_image"
+    if args.image_url:
+        image = urllib2.urlopen(args.image_url)
+        with open(out_image, 'w') as f:
+            image_data = image.read()
+            f.write(image_data)
     else:
-        image_file = urllib2.urlopen(args.image_url)
+        shutil.copyfile(args.image_file, out_image)
 
-    colors = detect_color(image_file)
-    store_color_output(colors, args.outdir)
+    with open(out_image) as image_file:
+        colors = detect_color(image_file)
+        colordata_file = args.outdir + "/colordata.json"
 
-    if args.image_file:
-        image_file.close()
+        with open(colordata_file, 'w') as f:
+            json.dump(colors, f, indent=2)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

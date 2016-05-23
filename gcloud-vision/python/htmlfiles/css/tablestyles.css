@@ -1,0 +1,22 @@
+/*Table Styles
+*/
+table.sortable {
+	font-family:arial;
+	margin:10px 0pt 15px;
+	font-size: 10pt;
+	text-align: right;
+	border-collapse: collapse;
+	border-spacing: 10px 2px;
+}
+
+td { 
+    padding: 2px 5px;
+}
+
+table.sortable thead tr th, table.sortable tfoot tr th {
+	background-color: #e6EEEE;
+	border: 1px solid #FFF;
+	font-size: 8pt;
+	padding: 4px;
+	border: 1px solid black;
+}
