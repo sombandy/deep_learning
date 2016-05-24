@@ -21,47 +21,52 @@ class GVImageAnalysis(object):
         self.gvision_service = discovery.build(
             'vision', 'v1', credentials=credentials,
             discoveryServiceUrl=DISCOVERY_URL)
-        self.image = None
 
-    def set_image(self, image_file):
+    def analyze(self, image_file, max_results=5):
         with open(image_file) as f:
             image_content = f.read()
-            self.image = base64.b64encode(image_content).decode('UTF-8')
+            image = base64.b64encode(image_content).decode('UTF-8')
 
-    def detect_color(self, max_results=5):
+        if not image:
+            print "Image is not provided"
+            return
+
+        features = []
+        request_types = ['LABEL_DETECTION', 'LOGO_DETECTION',
+            'TEXT_DETECTION', 'IMAGE_PROPERTIES']
+        for t in request_types:
+            features.append({ 'type': t, 'maxResults': max_results})
+
         batch_request = [{
             'image': {
-                'content': self.image
+                'content': image
                 },
-            'features': [{
-                'type': 'IMAGE_PROPERTIES',
-                'maxResults': max_results,
-                }]
-            }]
+            'features': features
+        }]
 
         request = self.gvision_service.images().annotate(body={
             'requests': batch_request,
             })
         response = request.execute()
-        return response['responses'][0]['imagePropertiesAnnotation'][
-            'dominantColors']['colors']
+        response = response['responses'][0]
 
-    def get_labels(self, max_results=5):
-        batch_request = [{
-            'image': {
-                'content': self.image
-                },
-            'features': [{
-                'type': 'LABEL_DETECTION',
-                'maxResults': max_results,
-                }]
+        self.labels = response.get('labelAnnotations', None)
+        self.logos = response.get('logoAnnotations', None)
+        self.colors = response['imagePropertiesAnnotation']['dominantColors']['colors']
+
+        if 'textAnnotations' in response:
+            text0 = response['textAnnotations'][0]
+            self.texts = [{ 
+                'locale': text0['locale'],
+                'description' : text0['description'].replace('\n', '<br/>')
             }]
 
-        request = self.gvision_service.images().annotate(body={
-            'requests': batch_request,
-            })
-        response = request.execute()
-        return response['responses'][0]['labelAnnotations']
+def write_json_to_file(json_data, filename):
+    with open(filename, 'w') as f:
+        if json_data:
+            json.dump(json_data, f, indent=2)
+        else:
+            f.write("[]\n")
 
 def main(args):
     if not args.image_file and not args.image_url:
@@ -78,17 +83,13 @@ def main(args):
         shutil.copyfile(args.image_file, out_image)
 
     gv_image = GVImageAnalysis()
-    gv_image.set_image(out_image)
+    gv_image.analyze(out_image)
 
-    colors = gv_image.detect_color()
-    colors_file = args.outdir + "/data/colors.json"
-    with open(colors_file, 'w') as f:
-        json.dump(colors, f, indent=2)
+    write_json_to_file(gv_image.colors, args.outdir + "/data/colors.json")
+    write_json_to_file(gv_image.labels, args.outdir + "/data/labels.json")
+    write_json_to_file(gv_image.logos, args.outdir + "/data/logos.json")
+    write_json_to_file(gv_image.texts, args.outdir + "/data/texts.json")
 
-    labels = gv_image.get_labels()
-    labels_file = args.outdir + "/data/labels.json"
-    with open(labels_file, 'w') as f:
-        json.dump(labels, f, indent=2)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
