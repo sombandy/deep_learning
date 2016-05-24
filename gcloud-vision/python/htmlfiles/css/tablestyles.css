@@ -9,10 +9,9 @@ table.sortable {
 	border-spacing: 10px 2px;
 }
 
-td { 
-    padding: 2px 5px;
+th {
+	background-color: #e6EEEE;
 }
-
 table.sortable thead tr th, table.sortable tfoot tr th {
 	background-color: #e6EEEE;
 	border: 1px solid #FFF;
