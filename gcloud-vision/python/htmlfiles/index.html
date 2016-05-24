@@ -4,7 +4,6 @@
 	<title>Product Attributes</title>
 	<script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/tablestyles.css">
-	<script src="js/sorttable.js"></script>
 
 	<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.css">
 	<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.js"></script>
@@ -30,7 +29,7 @@
 
 	<hr/>
 	<h4>Colors</h4>
-	<div id="colordata">
+	<div id="color">
 		<table id='colortable' class="display" border='1' width="50%" align="left">
 			<thead>
 				<tr>
@@ -44,7 +43,37 @@
 		</table>
 	</div>
 
+	<hr/>
+	<h4>Logos</h4>
+	<div id="logo">
+		<table id='logotable' class="display" border='1' width="25%" align="left">
+			<thead>
+				<tr>
+					<th>Score</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+
+	<hr/>
+	<h4>Texts</h4>
+	<div id="texts">
+		<table id='texttable' class="display" border='1' width="25%" align="left">
+			<thead>
+				<tr>
+					<th>Locale</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+
 	<script type="text/javascript" src='js/colordata.js'></script>
 	<script type="text/javascript" src='js/labeldata.js'></script>
+	<script type="text/javascript" src='js/logodata.js'></script>
+	<script type="text/javascript" src='js/textdata.js'></script>
 </body>
 </html>
