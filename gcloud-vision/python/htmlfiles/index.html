@@ -2,9 +2,13 @@
 <html>
 <head>
 	<title>Product Attributes</title>
-	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+	<script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/tablestyles.css">
 	<script src="js/sorttable.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.css">
+	<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.js"></script>
+
 </head>
 
 <body>
@@ -12,8 +16,8 @@
 	<img src="img/source_image" alt="Source Image" style="width:304px;height:228px;">
 	<hr/>
 	<h4>Labels</h4>
-	<div id="labeldata">
-		<table class="sortable" border='1'>
+	<div id="labels">
+		<table id='labeltable' class="display" border='1' width="50%" align="left">
 			<thead>
 				<tr>
 					<th>Score</th>
@@ -21,14 +25,13 @@
 					<th>Description</th>
 				</tr>
 			</thead>
-			<tbody></tbody>
 		</table>
 	</div>
 
 	<hr/>
 	<h4>Colors</h4>
 	<div id="colordata">
-		<table class="sortable" border='1'>
+		<table id='colortable' class="display" border='1' width="50%" align="left">
 			<thead>
 				<tr>
 					<th>Score</th>
