@@ -13,6 +13,10 @@ def accuracy(predictions, labels):
 class TFNNBase(object):
     """ Base class for Neural Network
     """
+    def __init__(self, l2=0.0, keep_prob=1.0):
+        self.l2 = l2
+        self.keep_prob = keep_prob
+
     def __enter__(self):
         print "Creating Session"
         self.sess = tf.Session()
@@ -35,14 +39,14 @@ class TFNNBase(object):
         pass
 
     def l2_loss(self):
-        return 0
+        return 0.0
 
-    def loss(self, l2=1e-3):
+    def loss(self):
         ce_loss = tf.nn.softmax_cross_entropy_with_logits(
             self.get_logits(self.train_dataset),
             self.train_labels
         )
-        loss = ce_loss + l2 * self.l2_loss()
+        loss = ce_loss + self.l2 * self.l2_loss()
         return tf.reduce_mean(loss)
 
     def train(self, train_dataset, train_labels,
