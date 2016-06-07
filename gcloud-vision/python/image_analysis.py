@@ -54,9 +54,10 @@ class GVImageAnalysis(object):
         self.logos = response.get('logoAnnotations', None)
         self.colors = response['imagePropertiesAnnotation']['dominantColors']['colors']
 
+        self.texts = None
         if 'textAnnotations' in response:
             text0 = response['textAnnotations'][0]
-            self.texts = [{ 
+            self.texts = [{
                 'locale': text0['locale'],
                 'description' : text0['description'].replace('\n', '<br/>')
             }]
