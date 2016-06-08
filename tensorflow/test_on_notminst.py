@@ -11,20 +11,11 @@
  You first need to first create the 'notMNIST.pickle' as shown in
  https://github.com/tensorflow/tensorflow/blob/r0.9/tensorflow/examples/udacity/1_notmnist.ipynb
 """
-import numpy as np
 import time
 from six.moves import cPickle as pickle
+import data_prep_notminst as dp
 import logistic_regression as lr
 import one_hidden_layer_nn as hnn
-
-IMAGE_SIZE = 28
-NUM_LABELS = 10
-
-def reformat(dataset, labels):
-  dataset = dataset.reshape((-1, IMAGE_SIZE * IMAGE_SIZE)).astype(np.float32)
-  # Map 2 to [0.0, 1.0, 0.0 ...], 3 to [0.0, 0.0, 1.0 ...]
-  labels = (np.arange(NUM_LABELS) == labels[:,None]).astype(np.float32)
-  return dataset, labels
 
 def main():
     pickle_file = 'notMNIST.pickle'
@@ -42,13 +33,12 @@ def main():
         print('Validation set', valid_dataset.shape, valid_labels.shape)
         print('Test set', test_dataset.shape, test_labels.shape)
 
-    train_dataset, train_labels = reformat(train_dataset, train_labels)
-    valid_dataset, valid_labels = reformat(valid_dataset, valid_labels)
-    test_dataset, test_labels = reformat(test_dataset, test_labels)
+    train_dataset, train_labels = dp.reformat(train_dataset, train_labels)
+    valid_dataset, valid_labels = dp.reformat(valid_dataset, valid_labels)
+    test_dataset, test_labels = dp.reformat(test_dataset, test_labels)
     print('Training set', train_dataset.shape, train_labels.shape)
     print('Validation set', valid_dataset.shape, valid_labels.shape)
     print('Test set', test_dataset.shape, test_labels.shape)
-
 
     lr_acc = 0
     hnn_acc = 0
