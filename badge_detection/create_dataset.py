@@ -30,7 +30,7 @@ def get_jpg_files(file_dir):
     jpg_files = []
     for root, dirs, files in os.walk(file_dir):
         for file in files:
-            if file.endswith('.jpg'):
+            if file.endswith('.jpg') or file.endswith('.jpeg'):
                 jpg_files.append(os.path.join(root, file))
     return jpg_files
 
@@ -52,8 +52,9 @@ def get_image_label(config, img_file, img_h, img_w, channel, badges):
 
     label = 0
     if random.random() <= config["positive_class"]:
-        label = np.random.randint(len(badges)) + 1
-        img = paste_badge(img, badges[label - 1])
+        idx = np.random.randint(len(badges))
+        img = paste_badge(img, badges[idx])
+        label = 1
 
     return img, label
 
@@ -97,11 +98,7 @@ def get_dataset(config):
 
     return dataset, labels
 
-def create_pickle(config_file, pickle_file):
-    config = None
-    with open(config_file) as f:
-        config = json.load(f)
-
+def get_train_dataset(config):
     dataset, labels = get_dataset(config)
     if dataset is None or labels is None:
         print "No data set is created"
@@ -122,21 +119,72 @@ def create_pickle(config_file, pickle_file):
     train_labels = labels[idx :]
     train_dataset = dataset[idx:, ]
 
-    try:
-        f = open(pickle_file, 'wb')
-        save = {
-            'train_dataset': train_dataset,
-            'train_labels': train_labels,
-            'valid_dataset': valid_dataset,
-            'valid_labels': valid_labels,
-            'test_dataset': test_dataset,
-            'test_labels': test_labels,
-            }
-        pickle.dump(save, f, pickle.HIGHEST_PROTOCOL)
-        f.close()
-    except Exception as e:
-        print('Unable to save data to', pickle_file, ':', e)
-        raise
+    save = {
+        'train_dataset': train_dataset,
+        'train_labels': train_labels,
+        'valid_dataset': valid_dataset,
+        'valid_labels': valid_labels,
+        'test_dataset': test_dataset,
+        'test_labels': test_labels,
+    }
+    return save
+
+def load_images(data_dir, img_w, img_h, channel):
+    files = get_jpg_files(data_dir)
+
+    images = []
+    for f in files:
+        img = ndimage.imread(f)
+
+        if (len(img.shape) != 3 or img.shape[2] != channel):
+            print f, "Number of channel is less", img.shape
+        else:
+            img = misc.imresize(img, size=(img_h, img_w))
+            images.append(img)
+    return images
+
+def get_custom_test_dataset(config):
+    if "test_dir" not in config:
+        return
+    print "Loading custom test data"
+
+    img_w = config["img_width"]
+    img_h = config["img_height"]
+    channel = config["channel"]
+
+    pos_examples = load_images(config["test_dir"] + "/pos", img_w, img_h, channel)
+    neg_examples = load_images(config["test_dir"] + "/neg", img_w, img_h, channel)
+    num_examples = len(pos_examples) + len(neg_examples)
+    labels = np.ndarray(num_examples, dtype=np.int32)
+    dataset = np.ndarray(shape=(num_examples, img_h, img_w, channel), dtype=np.float32)
+
+    dataset[:len(pos_examples), ] = np.array(pos_examples)
+    dataset[len(pos_examples): , ] = np.array(neg_examples)
+
+    labels[:len(pos_examples)] = np.ones(len(pos_examples))
+    labels[len(pos_examples):] = np.zeros(len(neg_examples))
+
+    return dataset, labels
+
+def create_pickle(config_file, pickle_file):
+    config = None
+    with open(config_file) as f:
+        config = json.load(f)
+
+    save = get_train_dataset(config)
+    test_dataset, test_labels = get_custom_test_dataset(config)
+
+    save["custom_test_dataset"] = test_dataset
+    save["custom_test_labels"] = test_labels
+
+    if save:
+        try:
+            f = open(pickle_file, 'wb')
+            pickle.dump(save, f, pickle.HIGHEST_PROTOCOL)
+            f.close()
+        except Exception as e:
+            print('Unable to save data to', pickle_file, ':', e)
+            raise
 
 if __name__ == '__main__':
     create_pickle('config.json', 'badged_images.pickle')

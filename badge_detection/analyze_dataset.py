@@ -5,6 +5,7 @@
 
 import cPickle as pickle
 import numpy as np
+import scipy.misc
 import sys
 
 def main():
@@ -19,7 +20,7 @@ def main():
     if datasets is None:
         return
 
-    data_types = ["train", "valid", "test"]
+    data_types = ["train", "valid", "test", "custom_test"]
 
     print "Sizes:"
     for t in data_types:
@@ -28,6 +29,14 @@ def main():
     print "Class labels:"
     for t in data_types:
         print t, np.bincount(datasets[t + "_labels"])
+
+    train_labels = datasets["train_labels"]
+    badged = train_labels.nonzero()[0]
+    badged_idx = np.random.choice(badged)
+
+    img = datasets["train_dataset"][badged_idx]
+    print img.shape
+    scipy.misc.imsave("/tmp/badged_image.jpg", img)
 
 if __name__ == "__main__":
     main()

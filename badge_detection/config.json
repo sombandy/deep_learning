@@ -1,0 +1,12 @@
+{
+  "img_dir" : "images/items/xa1",
+  "badge_dir" : "images/badges",
+  "test_dir" : "images/test_data",
+  "max_images" : 2500,
+  "img_width" : 256,
+  "img_height" : 256,
+  "channel" : 3,
+  "positive_class" : 0.4,
+  "valid_size": 0.1,
+  "test_size" : 0.1
+}
